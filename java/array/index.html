@@ -1,0 +1,1112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>☕ Java Arrays — Developer Notes</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=IBM+Plex+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:        #0d1117;
+    --surface:   #161b22;
+    --surface2:  #1e2530;
+    --border:    #30363d;
+    --text:      #e6edf3;
+    --muted:     #8b949e;
+    --accent:    #f0883e;
+    --accent2:   #58a6ff;
+    --accent3:   #3fb950;
+    --accent4:   #ff7b72;
+    --accent5:   #d2a8ff;
+    --warn:      #e3b341;
+    --kw:        #ff7b72;
+    --type:      #79c0ff;
+    --str:       #a5d6ff;
+    --comment:   #8b949e;
+    --num:       #f0883e;
+    --fn:        #d2a8ff;
+    --tag-ok:    #1a4731;
+    --tag-err:   #3d1f1f;
+    --tag-warn:  #3d2f0a;
+    --tag-note:  #0d2744;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 15px;
+    line-height: 1.7;
+    padding: 0 20px 60px;
+    max-width: 960px;
+    margin: 0 auto;
+  }
+
+  /* ── HERO ──────────────────────────────── */
+  .hero {
+    background: linear-gradient(135deg, #1a2332 0%, #0d1f35 50%, #1a1025 100%);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 42px 40px 36px;
+    margin: 30px 0 36px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -40px; right: -40px;
+    width: 220px; height: 220px;
+    background: radial-gradient(circle, rgba(88,166,255,0.12) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  .hero h1 {
+    font-size: 2.4rem;
+    font-weight: 700;
+    color: var(--accent2);
+    letter-spacing: -0.5px;
+    line-height: 1.2;
+    margin-bottom: 8px;
+  }
+  .hero .subtitle {
+    color: var(--muted);
+    font-size: 0.95rem;
+    font-weight: 300;
+    letter-spacing: 0.5px;
+  }
+  .hero .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 20px;
+  }
+  .badge {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 3px 12px;
+    font-size: 0.78rem;
+    color: var(--accent2);
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* ── TOC ────────────────────────────────── */
+  .toc {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--accent2);
+    border-radius: 10px;
+    padding: 22px 28px;
+    margin-bottom: 36px;
+  }
+  .toc h3 {
+    color: var(--accent2);
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 14px;
+  }
+  .toc ol {
+    padding-left: 18px;
+    columns: 2;
+    column-gap: 24px;
+  }
+  .toc li {
+    margin-bottom: 4px;
+    color: var(--muted);
+    font-size: 0.88rem;
+    break-inside: avoid;
+  }
+  .toc a { color: var(--accent2); text-decoration: none; }
+  .toc a:hover { text-decoration: underline; }
+
+  /* ── SECTION ────────────────────────────── */
+  .section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 30px 32px;
+    margin-bottom: 24px;
+  }
+  .section-title {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--text);
+    padding-bottom: 14px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .section-title .icon { font-size: 1.3rem; }
+
+  h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--accent2);
+    margin: 22px 0 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    font-size: 0.85rem;
+  }
+  h4 {
+    color: var(--accent5);
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin: 16px 0 8px;
+  }
+  p { margin-bottom: 12px; color: var(--text); }
+
+  /* ── CODE BLOCKS ────────────────────────── */
+  .code-block {
+    background: #010409;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    margin: 14px 0;
+  }
+  .code-header {
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+    padding: 7px 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--muted);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .code-header .lang { color: var(--accent); }
+  .code-body {
+    padding: 18px 20px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.84rem;
+    line-height: 1.75;
+    overflow-x: auto;
+    white-space: pre;
+  }
+  /* Syntax colors */
+  .kw  { color: var(--kw);      font-weight: 600; }
+  .ty  { color: var(--type);    }
+  .str { color: var(--str);     }
+  .num { color: var(--num);     }
+  .cmt { color: var(--comment); font-style: italic; }
+  .fn  { color: var(--fn);      }
+  .ok  { color: var(--accent3); }
+  .er  { color: var(--accent4); }
+  .warn-c { color: var(--warn); }
+
+  /* ── ASCII DIAGRAM ──────────────────────── */
+  .diagram {
+    background: #010409;
+    border: 1px solid #2d4a2d;
+    border-radius: 8px;
+    padding: 18px 20px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.82rem;
+    line-height: 1.65;
+    overflow-x: auto;
+    white-space: pre;
+    color: #a5d6ff;
+    margin: 14px 0;
+  }
+
+  /* ── CALLOUT BOXES ──────────────────────── */
+  .callout {
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin: 14px 0;
+    font-size: 0.9rem;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    border: 1px solid;
+  }
+  .callout .icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 1px; }
+  .callout.tip    { background: var(--tag-ok);   border-color: var(--accent3); color: #b5e8b0; }
+  .callout.warn   { background: var(--tag-warn);  border-color: var(--warn);    color: #fde68a; }
+  .callout.error  { background: var(--tag-err);   border-color: var(--accent4); color: #fca5a5; }
+  .callout.info   { background: var(--tag-note);  border-color: var(--accent2); color: #bfdbfe; }
+  .callout.interview { background: #1e1a2e; border-color: var(--accent5); color: var(--accent5); }
+
+  /* ── TABLES ─────────────────────────────── */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 14px 0;
+    font-size: 0.88rem;
+  }
+  th {
+    background: var(--surface2);
+    color: var(--accent2);
+    padding: 10px 14px;
+    text-align: left;
+    font-weight: 600;
+    border: 1px solid var(--border);
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  td {
+    padding: 9px 14px;
+    border: 1px solid var(--border);
+    color: var(--text);
+    vertical-align: top;
+  }
+  tr:nth-child(even) td { background: rgba(255,255,255,0.02); }
+  td.ok-val  { color: var(--accent3); font-family: 'JetBrains Mono', monospace; font-size: 0.82rem; }
+  td.err-val { color: var(--accent4); font-family: 'JetBrains Mono', monospace; font-size: 0.82rem; }
+  td code { font-family: 'JetBrains Mono', monospace; color: var(--accent); font-size: 0.82rem; background: var(--surface2); padding: 1px 6px; border-radius: 4px; }
+
+  /* ── INLINE CODE ────────────────────────── */
+  ic {
+    font-family: 'JetBrains Mono', monospace;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--accent);
+    padding: 1px 7px;
+    border-radius: 4px;
+    font-size: 0.82rem;
+  }
+
+  /* ── BULLET LISTS ───────────────────────── */
+  ul.notes { list-style: none; padding: 0; }
+  ul.notes li {
+    padding: 5px 0 5px 22px;
+    position: relative;
+    color: var(--text);
+    font-size: 0.93rem;
+  }
+  ul.notes li::before { content: '▸'; position: absolute; left: 0; color: var(--accent2); }
+
+  ul.valid-list { list-style: none; padding: 0; }
+  ul.valid-list li { padding: 4px 0; font-family: 'JetBrains Mono', monospace; font-size: 0.82rem; }
+  ul.valid-list li.ok::before  { content: '✅ '; }
+  ul.valid-list li.err::before { content: '❌ '; }
+
+  /* ── DIVIDER ────────────────────────────── */
+  .divider { border: none; border-top: 1px solid var(--border); margin: 20px 0; }
+
+  /* ── GRID ───────────────────────────────── */
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 14px 0; }
+  @media(max-width:640px){ .grid2{ grid-template-columns:1fr; } .toc ol{ columns:1; } }
+
+  .mini-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 16px;
+    font-size: 0.88rem;
+  }
+  .mini-card .title { color: var(--accent2); font-weight: 600; margin-bottom: 6px; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.5px; }
+
+  /* ── FOOTER ─────────────────────────────── */
+  .footer {
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.78rem;
+    margin-top: 48px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════
+     HERO
+══════════════════════════════════════════ -->
+<div class="hero">
+  <h1>☕ Java Arrays</h1>
+  <p class="subtitle">Structured Developer Notes · DSA-Ready · Interview-Focused</p>
+  <div class="tags">
+    <span class="badge">📦 Arrays</span>
+    <span class="badge">🔢 1D / 2D / nD</span>
+    <span class="badge">🧠 Internals</span>
+    <span class="badge">⚠️ Exceptions</span>
+    <span class="badge">🎯 Interview Traps</span>
+    <span class="badge">🔄 Traversal</span>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     TABLE OF CONTENTS
+══════════════════════════════════════════ -->
+<div class="toc">
+  <h3>📋 Table of Contents</h3>
+  <ol>
+    <li><a href="#s1">What is an Array?</a></li>
+    <li><a href="#s2">Types of Arrays</a></li>
+    <li><a href="#s3">Internal Memory Model</a></li>
+    <li><a href="#s4">Declaration Styles</a></li>
+    <li><a href="#s5">1D Arrays</a></li>
+    <li><a href="#s6">Multi-Dimensional Arrays</a></li>
+    <li><a href="#s7">Declaration Validity</a></li>
+    <li><a href="#s8">Instantiation Rules</a></li>
+    <li><a href="#s9">Static vs Dynamic Init</a></li>
+    <li><a href="#s10">Important Properties</a></li>
+    <li><a href="#s11">Anonymous Arrays</a></li>
+    <li><a href="#s12">Element Assignments</a></li>
+    <li><a href="#s13">Variable Assignments</a></li>
+    <li><a href="#s14">Common Exceptions</a></li>
+    <li><a href="#s15">Traversal Methods</a></li>
+  </ol>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     S1 – WHAT IS AN ARRAY
+══════════════════════════════════════════ -->
+<div class="section" id="s1">
+  <div class="section-title"><span class="icon">📦</span> 1. What is an Array?</div>
+
+  <p>An <strong>Array</strong> is a <em>reference-type object</em> that acts as a fixed-size container storing multiple values of the <em>same data type</em> under a single variable name.</p>
+
+  <h3>🔑 Key Characteristics</h3>
+  <table>
+    <thead><tr><th>Property</th><th>Detail</th></tr></thead>
+    <tbody>
+      <tr><td>📦 Storage Type</td><td><strong>Reference Type</strong> — object lives in the <em>Heap</em></td></tr>
+      <tr><td>🔒 Size</td><td><strong>Fixed</strong> after creation — this is a known disadvantage</td></tr>
+      <tr><td>🔢 Indexing</td><td>Starts at <ic>0</ic>, ends at <ic>length - 1</ic></td></tr>
+      <tr><td>🎯 Elements</td><td><strong>Homogeneous</strong> — same data type only</td></tr>
+    </tbody>
+  </table>
+
+  <h3>📌 Quick Memory Example</h3>
+  <div class="diagram">int[] arr = {10, 20, 30};
+
+Index →   0     1     2
+Value →  10    20    30</div>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     S2 – TYPES OF ARRAYS
+══════════════════════════════════════════ -->
+<div class="section" id="s2">
+  <div class="section-title"><span class="icon">🗂️</span> 2. Types of Arrays</div>
+
+  <div class="diagram">                     ┌───────────────────┐
+                     │      ARRAYS       │
+                     └─────────┬─────────┘
+                               │
+         ┌─────────────────────┼─────────────────────┐
+         ↓                     ↓                     ↓
+    📏 1-DIMENSIONAL      📐 2-DIMENSIONAL      🏗️ MULTI-DIM
+       (Linear List)         (Matrix/Table)         (Cube, etc.)
+       int[] arr              int[][] arr            int[][][] arr</div>
+
+  <div class="callout info"><span class="icon">ℹ️</span><div><strong>DSA Note:</strong> 1D arrays map directly to most DSA problems (sliding window, two pointers, prefix sums). 2D arrays are used for grids, DP tables, and graph adjacency matrices.</div></div>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     S3 – INTERNAL MEMORY MODEL
+══════════════════════════════════════════ -->
+<div class="section" id="s3">
+  <div class="section-title"><span class="icon">🔬</span> 3. Internal Memory Model</div>
+
+  <h3>🏗️ Stack vs Heap</h3>
+  <div class="diagram">int[] arr = {10, 20, 30, 40, 50};
+
+  STACK (Reference)              HEAP (Object Data)
+ ┌──────────────────┐     ┌─────────────────────────────────┐
+ │  arr  [ref/addr] ├────▶│  [10]  [20]  [30]  [40]  [50]  │
+ └──────────────────┘     │    0     1     2     3     4  ← index │
+                          │  100   104   108   112   116  ← addr  │
+                          └─────────────────────────────────┘
+                             Each int = 4 bytes, contiguous!</div>
+
+  <h3>⚡ Why O(1) Random Access?</h3>
+  <div class="code-block">
+    <div class="code-header"><span>Formula</span><span class="lang">Math</span></div>
+    <div class="code-body"><span class="cmt">// Direct address calculation — no traversal needed!</span>
+address of arr[i] = base_address + (i × size_of_type)
+
+<span class="cmt">// Example: arr[3]</span>
+arr[3] = 100 + (3 × 4) = 112  <span class="ok">✅ direct jump!</span></div>
+  </div>
+
+  <div class="callout interview"><span class="icon">🎯</span><div><strong>Interview Question:</strong> "Why is array access O(1)?" — Answer: Elements are stored contiguously in memory. The address of any element is calculated in constant time using the formula above. No iteration required.</div></div>
+
+  <h3>🔑 Key Facts</h3>
+  <ul class="notes">
+    <li><ic>arr</ic> → reference variable stored on the <strong>Stack</strong></li>
+    <li>Actual array data → stored in the <strong>Heap</strong></li>
+    <li>Default value for <ic>int[]</ic> is <ic>0</ic></li>
+    <li>Printing <ic>arr</ic> gives something like <ic>[I@3e25a5</ic> (class name + hashcode)</li>
+  </ul>
+
+  <h3>📌 toString() Output Explained</h3>
+  <table>
+    <thead><tr><th>Array Type</th><th>Class Name</th><th>Output Example</th></tr></thead>
+    <tbody>
+      <tr><td><code>int[]</code></td><td><code>[I</code></td><td><code>[I@3e25a5</code></td></tr>
+      <tr><td><code>int[][]</code></td><td><code>[[I</code></td><td><code>[[I@3e25a5</code></td></tr>
+      <tr><td><code>double[]</code></td><td><code>[D</code></td><td><code>[D@3e25a5</code></td></tr>
+    </tbody>
+  </table>
+  <div class="callout info"><span class="icon">ℹ️</span><div><strong>Why?</strong> <ic>toString()</ic> from <ic>Object</ic> class returns <ic>classname@hexHashCode</ic>. Array class names are generated by the JVM (not accessible at programmer level).</div></div>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     S4 – DECLARATION STYLES
+══════════════════════════════════════════ -->
+<div class="section" id="s4">
+  <div class="section-title"><span class="icon">📌</span> 4. Declaration Styles</div>
+
+  <div class="code-block">
+    <div class="code-header"><span>Valid Declarations</span><span class="lang">Java</span></div>
+    <div class="code-body"><span class="ok">✅</span> <span class="ty">int</span>[] arr;     <span class="cmt">// ← Recommended (Type clarity)</span>
+<span class="ok">✅</span> <span class="ty">int</span> arr[];    <span class="cmt">// ← C-style (Valid but less preferred)</span>
+<span class="ok">✅</span> <span class="ty">int</span> []arr;    <span class="cmt">// ← Valid (Unusual spacing)</span></div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header"><span>Invalid Declarations</span><span class="lang">Java</span></div>
+    <div class="code-body"><span class="er">❌</span> <span class="ty">int</span>[5] arr;             <span class="cmt">// Size NOT allowed in declaration → Compile Error</span>
+<span class="er">❌</span> <span class="ty">int</span>[] arr = <span class="kw">new</span> <span class="ty">int</span>[];   <span class="cmt">// Size MUST be specified → Compile Error</span></div>
+  </div>
+
+  <h3>🧠 Multiple Variable Declarations — Tricky!</h3>
+  <table>
+    <thead><tr><th>Declaration</th><th>Dimensions</th><th>Valid?</th></tr></thead>
+    <tbody>
+      <tr><td><code>int[] a, b;</code></td><td>a→1D, b→1D</td><td class="ok-val">✅ Valid</td></tr>
+      <tr><td><code>int[] a[], b;</code></td><td>a→2D, b→1D</td><td class="ok-val">✅ Valid</td></tr>
+      <tr><td><code>int[] []a, b;</code></td><td>a→2D, b→2D</td><td class="ok-val">✅ Valid</td></tr>
+      <tr><td><code>int[] a, []b;</code></td><td>a→valid, b→invalid</td><td class="err-val">❌ Compile Error</td></tr>
+      <tr><td><code>int[] []a, []b;</code></td><td>a→valid, b→invalid</td><td class="err-val">❌ Compile Error</td></tr>
+    </tbody>
+  </table>
+  <div class="callout warn"><span class="icon">⚠️</span><div><strong>Rule:</strong> Extra dimension before variable name is only allowed for the <em>first</em> variable in a declaration. Subsequent variables cannot use this syntax.</div></div>
+
+  <h3>📊 Valid Ways to Declare 2D &amp; 3D Arrays</h3>
+  <div class="grid2">
+    <div class="mini-card">
+      <div class="title">2D Array — 6 Valid Ways</div>
+      <div class="code-body" style="padding:0;font-size:0.8rem;background:none;color:var(--accent3)">int[][] a;
+int [][]a;
+int a[][];
+int[] []a;
+int[] a[];
+int []a[];</div>
+    </div>
+    <div class="mini-card">
+      <div class="title">3D Array — 10 Valid Ways</div>
+      <div class="code-body" style="padding:0;font-size:0.8rem;background:none;color:var(--accent5)">int[][][] a;
+int [][][]a;
+int a[][][];
+int[] [][]a;
+int[] a[][];
+int[] []a[];
+int[][] []a;
+int[][] a[];
+int []a[][];
+int [][]a[];</div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     S5 – 1D ARRAYS
+══════════════════════════════════════════ -->
+<div class="section" id="s5">
+  <div class="section-title"><span class="icon">📏</span> 5. Single Dimensional Arrays</div>
+
+  <h3>📝 Declaration → Construction → Initialization</h3>
+
+  <div class="code-block">
+    <div class="code-header"><span>Step-by-Step</span><span class="lang">Java</span></div>
+    <div class="code-body"><span class="cmt">// Step 1: Declaration — reserve a reference name</span>
+<span class="ty">int</span>[] arr;
+
+<span class="cmt">// Step 2: Construction — allocate heap memory</span>
+arr = <span class="kw">new</span> <span class="ty">int</span>[5];   <span class="cmt">// Defaults: 0,0,0,0,0</span>
+
+<span class="cmt">// Step 3: Initialization — assign values</span>
+arr[0] = 10;
+arr[1] = 20;
+arr[2] = 30;</div>
+  </div>
+
+  <div class="diagram">Anatomy of: int[] arr = new int[5];
+
+   int[]    arr   =   new   int  [5]
+     │       │          │    │    │
+     │       │          │    │    └── Size (Mandatory!)
+     │       │          │    └─────── Data Type
+     │       │          └──────────── Creates object in Heap
+     │       └─────────────────────── Reference Variable (Stack)
+     └─────────────────────────────── Array Type</div>
+
+  <h3>📋 Default Values</h3>
+  <table>
+    <thead><tr><th>Type</th><th>Default Value</th></tr></thead>
+    <tbody>
+      <tr><td><code>int</code></td><td><code>0</code></td></tr>
+      <tr><td><code>float / double</code></td><td><code>0.0</code></td></tr>
+      <tr><td><code>boolean</code></td><td><code>false</code></td></tr>
+      <tr><td><code>char</code></td><td><code>'\u0000'</code> (null char)</td></tr>
+      <tr><td><code>Object / String</code></td><td><code>null</code></td></tr>
+    </tbody>
+  </table>
+
+  <h3>🆚 Primitive Array vs Object Array</h3>
+  <table>
+    <thead><tr><th></th><th>Primitive Array</th><th>Object Array</th></tr></thead>
+    <tbody>
+      <tr><td>Stores</td><td>Actual values</td><td>References to objects</td></tr>
+      <tr><td>Speed</td><td>⚡ Faster</td><td>🐢 Slightly slower</td></tr>
+      <tr><td>Example</td><td><code>int[]</code></td><td><code>String[]</code></td></tr>
+      <tr><td>Default</td><td><code>0 / false / 0.0</code></td><td><code>null</code></td></tr>
+    </tbody>
+  </table>
+
+  <div class="code-block">
+    <div class="code-header"><span>String Array Default</span><span class="lang">Java</span></div>
+    <div class="code-body"><span class="ty">String</span>[] names = <span class="kw">new</span> <span class="ty">String</span>[3];
+<span class="cmt">// names[0] = null, names[1] = null, names[2] = null</span></div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     S6 – MULTI-DIMENSIONAL ARRAYS
+══════════════════════════════════════════ -->
+<div class="section" id="s6">
+  <div class="section-title"><span class="icon">📐</span> 6. Multi-Dimensional Arrays</div>
+
+  <h3>🧠 Jagged Arrays — Java's Superpower!</h3>
+  <p>Unlike C/C++, Java allows rows in a 2D array to have <em>different lengths</em> — called <strong>Jagged Arrays</strong>.</p>
+
+  <div class="code-block">
+    <div class="code-header"><span>Jagged Array</span><span class="lang">Java</span></div>
+    <div class="code-body"><span class="ty">int</span>[][] arr = <span class="kw">new</span> <span class="ty">int</span>[2][];   <span class="cmt">// 2 rows, column sizes TBD</span>
+arr[0] = <span class="kw">new</span> <span class="ty">int</span>[3];             <span class="cmt">// row 0 has 3 elements</span>
+arr[1] = <span class="kw">new</span> <span class="ty">int</span>[5];             <span class="cmt">// row 1 has 5 elements ✅</span></div>
+  </div>
+
+  <h4>🗺️ Example 1 — 2D Jagged (rows: 3 + 2)</h4>
+  <div class="diagram">int[][] a = new int[2][];
+a[0] = new int[3];
+a[1] = new int[2];
+
+       ┌─────┬─────┐
+ a ──▶ │  •  │  •  │
+       └──┬──┴───┬─┘
+          │      │
+      ┌───┘      └──────┐
+      ▼                 ▼
+ ┌───┬───┬───┐     ┌───┬───┐
+ │ 0 │ 0 │ 0 │     │ 0 │ 0 │
+ └───┴───┴───┘     └───┴───┘
+  a[0] (size 3)     a[1] (size 2)</div>
+
+  <h4>🗺️ Example 2 — 3D Jagged</h4>
+  <div class="code-block">
+    <div class="code-header"><span>3D Jagged Array</span><span class="lang">Java</span></div>
+    <div class="code-body"><span class="ty">int</span>[][][] a = <span class="kw">new</span> <span class="ty">int</span>[2][][];
+a[0] = <span class="kw">new</span> <span class="ty">int</span>[3][];
+a[0][0] = <span class="kw">new</span> <span class="ty">int</span>[1];
+a[0][1] = <span class="kw">new</span> <span class="ty">int</span>[2];
+a[0][2] = <span class="kw">new</span> <span class="ty">int</span>[3];
+a[1] = <span class="kw">new</span> <span class="ty">int</span>[2][2];</div>
+  </div>
+
+  <div class="diagram">                    ┌─────┬─────┐
+              a ──▶  │  •  │  •  │   (Top-level: 2 slots)
+                     └──┬──┴───┬─┘
+                        │      │
+          ┌─────────────┘      └───────────────┐
+          ▼                                    ▼
+       [a[0]]                              [a[1]]
+    ┌───┬───┬───┐                       ┌───┬───┐
+    │ • │ • │ • │                       │ • │ • │
+    └─┬─┴─┬─┴─┬─┘                       └─┬─┴─┬─┘
+      │   │   │                           │   │
+  ┌───┘   │   └──────┐               ┌───┘   └───┐
+  ▼       ▼          ▼               ▼           ▼
+ ┌─┐   ┌─┬─┐   ┌─┬─┬─┐          ┌─┬─┐        ┌─┬─┐
+ │ │   │ │ │   │ │ │ │          │ │ │        │ │ │
+ └─┘   └─┴─┘   └─┴─┴─┘          └─┴─┘        └─┴─┘
+ (1)    (2)      (3)              (2)           (2)
+ ◄──────────────────────────────────────────────────▶
+          3rd level — Actual data storage</div>
+
+  <div class="callout interview"><span class="icon">🎯</span><div><strong>Interview:</strong> "What is a jagged array?" — Rows of different lengths. Java supports this; C/C++ does not natively. Used in triangular matrices, Pascal's Triangle DP, adjacency lists.</div></div>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     S7 – DECLARATION VALIDITY
+══════════════════════════════════════════ -->
+<div class="section" id="s7">
+  <div class="section-title"><span class="icon">✅</span> 7. Declaration Validity — Quiz Style</div>
+
+  <h3>New Expression Validity</h3>
+  <table>
+    <thead><tr><th>Expression</th><th>Valid?</th><th>Reason</th></tr></thead>
+    <tbody>
+      <tr><td><code>new int[]</code></td><td class="err-val">❌ CE</td><td>Array dimension missing</td></tr>
+      <tr><td><code>new int[3][4]</code></td><td class="ok-val">✅</td><td>Both dimensions specified</td></tr>
+      <tr><td><code>new int[3][]</code></td><td class="ok-val">✅</td><td>Jagged — columns defined later</td></tr>
+      <tr><td><code>new int[][4]</code></td><td class="err-val">❌ CE</td><td>First dim must be given first</td></tr>
+      <tr><td><code>new int[3][4][5]</code></td><td class="ok-val">✅</td><td>3D full specification</td></tr>
+      <tr><td><code>new int[3][4][]</code></td><td class="ok-val">✅</td><td>Jagged 3D</td></tr>
+      <tr><td><code>new int[3][][5]</code></td><td class="err-val">❌ CE</td><td>Middle dim missing before last</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout warn"><span class="icon">⚠️</span><div><strong>Rule:</strong> You can leave trailing dimensions empty for jagged arrays, but you can NEVER skip a dimension in the middle — dimensions are filled left to right.</div></div>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     S8 – INSTANTIATION RULES
+══════════════════════════════════════════ -->
+<div class="section" id="s8">
+  <div class="section-title"><span class="icon">⚙️</span> 8. Instantiation Rules</div>
+
+  <table>
+    <thead><tr><th>#</th><th>Rule</th><th>Example</th><th>Result</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>Size is mandatory</td><td><code>new int[]</code></td><td class="err-val">❌ CE</td></tr>
+      <tr><td>2</td><td>Size zero is legal</td><td><code>new int[0]</code></td><td class="ok-val">✅ length = 0</td></tr>
+      <tr><td>3</td><td>Negative size → runtime error</td><td><code>new int[-3]</code></td><td class="err-val">❌ NegativeArraySizeException</td></tr>
+      <tr><td>4</td><td>Allowed size types: byte, short, char, int</td><td><code>new int['a']</code></td><td class="ok-val">✅ Valid</td></tr>
+      <tr><td>4b</td><td>long / float not allowed as size</td><td><code>new int[10L]</code></td><td class="err-val">❌ CE: loss of precision</td></tr>
+      <tr><td>5</td><td>Max size = Integer.MAX_VALUE</td><td><code>new int[2147483647]</code></td><td class="ok-val">✅ (may get OutOfMemoryError at runtime)</td></tr>
+    </tbody>
+  </table>
+
+  <div class="code-block">
+    <div class="code-header"><span>Size Type Examples</span><span class="lang">Java</span></div>
+    <div class="code-body"><span class="ty">int</span>[] a = <span class="kw">new</span> <span class="ty">int</span>[<span class="str">'a'</span>];    <span class="ok">✅</span>  <span class="cmt">// char → int promoted</span>
+<span class="ty">byte</span> b = 10;
+<span class="ty">int</span>[] a = <span class="kw">new</span> <span class="ty">int</span>[b];      <span class="ok">✅</span>  <span class="cmt">// byte → int promoted</span>
+<span class="ty">short</span> s = 20;
+<span class="ty">int</span>[] a = <span class="kw">new</span> <span class="ty">int</span>[s];      <span class="ok">✅</span>  <span class="cmt">// short → int promoted</span>
+<span class="ty">int</span>[] a = <span class="kw">new</span> <span class="ty">int</span>[10l];    <span class="er">❌</span>  <span class="cmt">// long not allowed</span>
+<span class="ty">int</span>[] a = <span class="kw">new</span> <span class="ty">int</span>[10.5];   <span class="er">❌</span>  <span class="cmt">// float/double not allowed</span></div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     S9 – STATIC vs DYNAMIC INITIALIZATION
+══════════════════════════════════════════ -->
+<div class="section" id="s9">
+  <div class="section-title"><span class="icon">🅰️</span> 9. Static vs Dynamic Initialization</div>
+
+  <div class="grid2">
+    <div class="mini-card">
+      <div class="title">🅰️ Dynamic Initialization</div>
+      <ul class="notes" style="margin-top:8px">
+        <li>Size known at <strong>runtime</strong></li>
+        <li>Uses <ic>new</ic> keyword</li>
+        <li>Defaults assigned automatically</li>
+      </ul>
+      <div class="code-body" style="padding:10px 0 0;background:none;font-size:0.8rem;color:var(--accent2)">int[] arr = new int[5];</div>
+    </div>
+    <div class="mini-card">
+      <div class="title">🅱️ Static Initialization</div>
+      <ul class="notes" style="margin-top:8px">
+        <li>Values known at <strong>compile time</strong></li>
+        <li>Size auto-calculated</li>
+        <li>Values directly assigned</li>
+      </ul>
+      <div class="code-body" style="padding:10px 0 0;background:none;font-size:0.8rem;color:var(--accent3)">int[] arr = {10, 20, 30};</div>
+    </div>
+  </div>
+
+  <h3>⚠️ Separation Rule</h3>
+  <div class="code-block">
+    <div class="code-header"><span>Static Init — Separation</span><span class="lang">Java</span></div>
+    <div class="code-body"><span class="ty">int</span>[] arr; arr = <span class="kw">new</span> <span class="ty">int</span>[3];   <span class="ok">✅</span>  <span class="cmt">// Separate declaration + construction</span>
+<span class="ty">int</span>[] arr; arr = {1,2,3};         <span class="er">❌</span>  <span class="cmt">// Static init MUST be same statement!</span></div>
+  </div>
+
+  <h3>📋 Combined Forms Cheat Sheet</h3>
+  <div class="code-block">
+    <div class="code-header"><span>All Forms</span><span class="lang">Java</span></div>
+    <div class="code-body"><span class="cmt">// a) Declaration + Construction</span>
+<span class="ty">int</span>[] arr = <span class="kw">new</span> <span class="ty">int</span>[5];
+
+<span class="cmt">// b) Declaration + Initialization (shortcut)</span>
+<span class="ty">int</span>[] arr = {10, 20, 30, 40, 50};
+
+<span class="cmt">// c) Anonymous array (no variable)</span>
+<span class="kw">new</span> <span class="ty">int</span>[]{1, 2, 3};</div>
+  </div>
+
+  <h3>🖨️ Print Output Examples</h3>
+  <div class="code-block">
+    <div class="code-header"><span>System.out.println() on Arrays</span><span class="lang">Java</span></div>
+    <div class="code-body"><span class="ty">int</span>[] a = <span class="kw">new</span> <span class="ty">int</span>[3];
+<span class="fn">System.out.println</span>(a);        <span class="cmt">// [I@3e25a5   (ref of 1D int array)</span>
+<span class="fn">System.out.println</span>(a[0]);     <span class="cmt">// 0          (default)</span>
+
+<span class="ty">int</span>[][] b = <span class="kw">new</span> <span class="ty">int</span>[2][3];
+<span class="fn">System.out.println</span>(b);        <span class="cmt">// [[I@3e25a5 (ref of 2D int array)</span>
+<span class="fn">System.out.println</span>(b[0]);     <span class="cmt">// [I@19821f  (ref of row 0)</span>
+<span class="fn">System.out.println</span>(b[0][0]);  <span class="cmt">// 0</span>
+
+<span class="ty">int</span>[][] c = <span class="kw">new</span> <span class="ty">int</span>[2][];
+<span class="fn">System.out.println</span>(c[0]);     <span class="cmt">// null  ← row not yet allocated!</span>
+<span class="fn">System.out.println</span>(c[0][0]);  <span class="er">// ❌ NullPointerException</span></div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     S10 – IMPORTANT PROPERTIES
+══════════════════════════════════════════ -->
+<div class="section" id="s10">
+  <div class="section-title"><span class="icon">⚙️</span> 10. Important Properties</div>
+
+  <div class="grid2">
+    <div class="mini-card">
+      <div class="title">📏 length Property</div>
+      <p style="font-size:0.88rem;margin:8px 0">Returns the number of elements. It is a <strong>field</strong>, not a method!</p>
+      <div class="code-body" style="padding:6px 0;background:none;font-size:0.82rem;color:var(--accent)">arr.length   ✅
+arr.length() ❌</div>
+    </div>
+    <div class="mini-card">
+      <div class="title">🔢 Indexing</div>
+      <p style="font-size:0.88rem;margin:8px 0">Valid range: <ic>0</ic> to <ic>arr.length - 1</ic>. Going outside throws a runtime exception.</p>
+      <div class="code-body" style="padding:6px 0;background:none;font-size:0.82rem;color:var(--accent4)">arr[arr.length] → ❌ AIOOBE</div>
+    </div>
+  </div>
+
+  <h3>🔬 Strongly Typed Nature</h3>
+  <div class="code-block">
+    <div class="code-header"><span>Type Safety</span><span class="lang">Java</span></div>
+    <div class="code-body"><span class="ty">int</span>[] arr = <span class="kw">new</span> <span class="ty">int</span>[3];
+arr[0] = 10;     <span class="ok">✅</span>
+arr[1] = 10.5;   <span class="er">❌</span>  <span class="cmt">// Compile Error: type mismatch</span></div>
+  </div>
+  <ul class="notes">
+    <li>Every variable has a type</li>
+    <li>Every expression has a type</li>
+    <li>Compiler checks all assignments at compile time</li>
+  </ul>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     S11 – ANONYMOUS ARRAYS
+══════════════════════════════════════════ -->
+<div class="section" id="s11">
+  <div class="section-title"><span class="icon">👻</span> 11. Anonymous Arrays</div>
+
+  <p>Arrays without a reference variable — created on-the-fly, typically to pass directly into a method.</p>
+
+  <div class="code-block">
+    <div class="code-header"><span>Anonymous Array Syntax</span><span class="lang">Java</span></div>
+    <div class="code-body"><span class="cmt">// 1D Anonymous Array</span>
+<span class="kw">new</span> <span class="ty">int</span>[]{10, 20, 30}
+
+<span class="cmt">// 2D Anonymous Array</span>
+<span class="kw">new</span> <span class="ty">int</span>[][] {
+    {1, 2, 3},
+    {4, 5, 6},
+    {7, 8, 9}
+}
+
+<span class="cmt">// Usage: passing directly to a method</span>
+<span class="kw">public static void</span> <span class="fn">sum</span>(<span class="ty">int</span>[] x) { ... }
+<span class="fn">sum</span>(<span class="kw">new</span> <span class="ty">int</span>[]{10, 20, 30});  <span class="ok">✅</span>
+
+<span class="cmt">// INVALID — size + values together</span>
+<span class="kw">new</span> <span class="ty">int</span>[3]{10, 20, 30};      <span class="er">❌</span>  <span class="cmt">// don't mix size + initializer</span></div>
+  </div>
+
+  <div class="callout info"><span class="icon">ℹ️</span><div><strong>Real-world use:</strong> Common in unit tests, streams, and passing quick datasets to sorting/searching utility methods without polluting the scope with a variable.</div></div>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     S12 – ELEMENT ASSIGNMENTS
+══════════════════════════════════════════ -->
+<div class="section" id="s12">
+  <div class="section-title"><span class="icon">🔀</span> 12. Array Element Assignments</div>
+
+  <h3>Case 1 — Primitive Arrays</h3>
+  <p>Any type that can be <em>widening-promoted</em> to the declared type is allowed as an element.</p>
+
+  <div class="diagram">Widening Promotion Chain:
+
+byte ──▶ short ──┐
+                  ▼
+  char ──────▶  int ──▶ long ──▶ float ──▶ double</div>
+
+  <div class="code-block">
+    <div class="code-header"><span>int[] Element Assignment</span><span class="lang">Java</span></div>
+    <div class="code-body"><span class="ty">int</span>[] a = <span class="kw">new</span> <span class="ty">int</span>[5];
+a[0] = 97;       <span class="ok">✅</span>  <span class="cmt">// int literal</span>
+a[1] = <span class="str">'a'</span>;     <span class="ok">✅</span>  <span class="cmt">// char → int promoted</span>
+<span class="ty">byte</span> b = 10;
+a[2] = b;        <span class="ok">✅</span>  <span class="cmt">// byte → int</span>
+<span class="ty">short</span> s = 20;
+a[3] = s;        <span class="ok">✅</span>  <span class="cmt">// short → int</span>
+a[4] = 10l;      <span class="er">❌</span>  <span class="cmt">// long → int, loss of precision</span></div>
+  </div>
+
+  <h3>Case 2 — Object Type Arrays</h3>
+  <p>Declared type <em>or any child class object</em> is accepted.</p>
+
+  <div class="code-block">
+    <div class="code-header"><span>Object[] and Number[]</span><span class="lang">Java</span></div>
+    <div class="code-body"><span class="ty">Object</span>[] a = <span class="kw">new</span> <span class="ty">Object</span>[3];
+a[0] = <span class="kw">new</span> <span class="ty">Integer</span>(10);       <span class="ok">✅</span>
+a[1] = <span class="kw">new</span> <span class="ty">Object</span>();           <span class="ok">✅</span>
+a[2] = <span class="kw">new</span> <span class="ty">String</span>("hello");   <span class="ok">✅</span>
+
+<span class="ty">Number</span>[] n = <span class="kw">new</span> <span class="ty">Number</span>[3];
+n[0] = <span class="kw">new</span> <span class="ty">Integer</span>(10);       <span class="ok">✅</span>  <span class="cmt">// Integer extends Number</span>
+n[1] = <span class="kw">new</span> <span class="ty">Double</span>(10.5);      <span class="ok">✅</span>  <span class="cmt">// Double extends Number</span>
+n[2] = <span class="kw">new</span> <span class="ty">String</span>("hello");   <span class="er">❌</span>  <span class="cmt">// String does NOT extend Number</span></div>
+  </div>
+
+  <div class="diagram">Object
+   │
+ Number
+   │
+ ┌─┬─┬─┬─┬─┐
+ I  B  S  L  F  D
+ │  │  │  │  │  │
+ Integer Byte Short Long Float Double</div>
+
+  <h3>Case 3 — Interface Type Arrays</h3>
+  <div class="code-block">
+    <div class="code-header"><span>Interface Array</span><span class="lang">Java</span></div>
+    <div class="code-body"><span class="ty">Runnable</span>[] r = <span class="kw">new</span> <span class="ty">Runnable</span>[2];
+r[0] = <span class="kw">new</span> <span class="ty">Thread</span>();              <span class="ok">✅</span>  <span class="cmt">// Thread implements Runnable</span>
+r[1] = <span class="kw">new</span> <span class="ty">String</span>("hello");       <span class="er">❌</span>  <span class="cmt">// String doesn't implement Runnable</span></div>
+  </div>
+
+  <h3>📋 Summary Table</h3>
+  <table>
+    <thead><tr><th>Array Type</th><th>Allowed Element</th></tr></thead>
+    <tbody>
+      <tr><td>Primitive array</td><td>Any type widening-promotable to declared type</td></tr>
+      <tr><td>Object type array</td><td>Declared type OR its child class objects</td></tr>
+      <tr><td>Interface type array</td><td>Objects of classes that implement the interface</td></tr>
+      <tr><td>Abstract class type array</td><td>Objects of concrete child classes</td></tr>
+    </tbody>
+  </table>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     S13 – VARIABLE ASSIGNMENTS
+══════════════════════════════════════════ -->
+<div class="section" id="s13">
+  <div class="section-title"><span class="icon">🔄</span> 13. Array Variable Assignments</div>
+
+  <h3>Case 1 — Element Promotions ≠ Array Promotions</h3>
+  <div class="callout warn"><span class="icon">⚠️</span><div>Element-level promotion is <strong>NOT</strong> applicable at array object level.<br>A <ic>char</ic> value can promote to <ic>int</ic>, but <ic>char[]</ic> cannot be assigned to <ic>int[]</ic>!</div></div>
+
+  <table>
+    <thead><tr><th>Promotion</th><th>Valid?</th></tr></thead>
+    <tbody>
+      <tr><td><code>char → int</code></td><td class="ok-val">✅ Valid</td></tr>
+      <tr><td><code>char[] → int[]</code></td><td class="err-val">❌ Invalid</td></tr>
+      <tr><td><code>int → long</code></td><td class="ok-val">✅ Valid</td></tr>
+      <tr><td><code>int[] → long[]</code></td><td class="err-val">❌ Invalid</td></tr>
+      <tr><td><code>double → float</code></td><td class="err-val">❌ Invalid (narrowing)</td></tr>
+      <tr><td><code>double[] → float[]</code></td><td class="err-val">❌ Invalid</td></tr>
+      <tr><td><code>String → Object</code></td><td class="ok-val">✅ Valid</td></tr>
+      <tr><td><code>String[] → Object[]</code></td><td class="ok-val">✅ Valid (Object arrays support this!)</td></tr>
+    </tbody>
+  </table>
+
+  <div class="code-block">
+    <div class="code-header"><span>String[] to Object[]</span><span class="lang">Java</span></div>
+    <div class="code-body"><span class="ty">String</span>[] s = {"A", "B"};
+<span class="ty">Object</span>[] o = s;   <span class="ok">✅</span>  <span class="cmt">// Child type array → Parent type array (Object arrays)</span></div>
+  </div>
+
+  <h3>Case 2 — Reference Reassignment (Not Copy)</h3>
+  <div class="callout info"><span class="icon">ℹ️</span><div>When assigning one array to another, <strong>only the reference is copied</strong> — elements are NOT duplicated. Size doesn't matter; type must match.</div></div>
+
+  <div class="code-block">
+    <div class="code-header"><span>Reference Reassignment</span><span class="lang">Java</span></div>
+    <div class="code-body"><span class="ty">int</span>[] a = {10, 20, 30, 40, 50, 60, 70};
+<span class="ty">int</span>[] b = {80, 90};
+a = b;   <span class="ok">✅</span>  <span class="cmt">// a now points to b's array {80, 90}</span>
+b = a;   <span class="ok">✅</span>  <span class="cmt">// sizes don't matter, types match</span></div>
+  </div>
+
+  <h3>Case 3 — Dimension Must Match</h3>
+  <div class="code-block">
+    <div class="code-header"><span>Dimension Matching</span><span class="lang">Java</span></div>
+    <div class="code-body"><span class="ty">int</span>[][] a = <span class="kw">new</span> <span class="ty">int</span>[3][];
+a[0] = <span class="kw">new</span> <span class="ty">int</span>[4][5];   <span class="er">❌</span>  <span class="cmt">// 2D assigned to 1D slot</span>
+a[0] = 10;               <span class="er">❌</span>  <span class="cmt">// int assigned to int[] slot</span>
+a[0] = <span class="kw">new</span> <span class="ty">int</span>[4];       <span class="ok">✅</span>  <span class="cmt">// 1D int[] matches the slot</span></div>
+  </div>
+  <div class="callout tip"><span class="icon">✅</span><div><strong>Golden Rule:</strong> Types and dimensions must match. Sizes do NOT matter during array assignment.</div></div>
+
+  <h3>🧠 GC Tricky Example</h3>
+  <div class="code-block">
+    <div class="code-header"><span>GC Objects Count</span><span class="lang">Java</span></div>
+    <div class="code-body"><span class="ty">int</span>[][] a = <span class="kw">new</span> <span class="ty">int</span>[3][2];   <span class="cmt">// Creates: 1 outer + 3 rows = 4 objects</span>
+a[0] = <span class="kw">new</span> <span class="ty">int</span>[3];           <span class="cmt">// new row 0 = +1 object (old row 0 eligible for GC)</span>
+a[1] = <span class="kw">new</span> <span class="ty">int</span>[4];           <span class="cmt">// new row 1 = +1 object (old row 1 eligible for GC)</span>
+a = <span class="kw">new</span> <span class="ty">int</span>[4][3];           <span class="cmt">// new entire array = +5 objects (old a eligible for GC)</span>
+
+<span class="cmt">// Total objects created: 11
+// Objects eligible for GC: 6</span></div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     S14 – EXCEPTIONS
+══════════════════════════════════════════ -->
+<div class="section" id="s14">
+  <div class="section-title"><span class="icon">🚨</span> 14. Common Exceptions</div>
+
+  <table>
+    <thead><tr><th>Exception</th><th>Cause</th><th>Type</th><th>Example</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><code>ArrayIndexOutOfBoundsException</code></td>
+        <td>Index &lt; 0 or ≥ length</td>
+        <td>Runtime (Unchecked)</td>
+        <td><code>arr[5]</code> on size-5 array</td>
+      </tr>
+      <tr>
+        <td><code>NegativeArraySizeException</code></td>
+        <td>Negative size in new</td>
+        <td>Runtime</td>
+        <td><code>new int[-5]</code></td>
+      </tr>
+      <tr>
+        <td><code>NullPointerException</code></td>
+        <td>Null array reference used</td>
+        <td>Runtime</td>
+        <td><code>int[] a=null; a.length;</code></td>
+      </tr>
+      <tr>
+        <td><code>OutOfMemoryError</code></td>
+        <td>JVM heap exhausted</td>
+        <td>Error (not Exception)</td>
+        <td><code>new int[Integer.MAX_VALUE]</code></td>
+      </tr>
+      <tr>
+        <td>Type mismatch (CE)</td>
+        <td>Wrong type assigned</td>
+        <td>Compile Error</td>
+        <td><code>new int[2.5]</code></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>🔁 Classic Loop Bug — i &lt;= vs i &lt;</h3>
+  <div class="code-block">
+    <div class="code-header"><span>Off-by-One Error (Interview Trap!)</span><span class="lang">Java</span></div>
+    <div class="code-body"><span class="ty">String</span>[] argh = {"A", "B"};
+args = argh;
+
+<span class="cmt">// ❌ BUG: i <= args.length throws AIOOBE on i=2</span>
+<span class="kw">for</span> (<span class="ty">int</span> i = 0; i <span class="er">&lt;=</span> args.length; i++) {
+    <span class="fn">System.out.println</span>(args[i]);   <span class="er">// ❌ AIOOBE at i=2</span>
+}
+
+<span class="cmt">// ✅ CORRECT: i &lt; args.length</span>
+<span class="kw">for</span> (<span class="ty">int</span> i = 0; i <span class="ok">&lt;</span> args.length; i++) {
+    <span class="fn">System.out.println</span>(args[i]);   <span class="ok">// ✅ A, B</span>
+}
+
+<span class="cmt">// ✅ SAFEST: enhanced for-each</span>
+<span class="kw">for</span> (<span class="ty">String</span> s : args) {
+    <span class="fn">System.out.println</span>(s);         <span class="ok">// ✅ A, B</span>
+}</div>
+  </div>
+
+  <div class="callout interview"><span class="icon">🎯</span><div><strong>Interview Trap:</strong> "What happens with <ic>i &lt;= arr.length</ic>?" — Always throws AIOOBE on the last iteration. Use <ic>i &lt; arr.length</ic> or enhanced for-each.</div></div>
+</div>
+
+
+<!-- S15 – TRAVERSAL -->
+<div class="section" id="s15">
+  <div class="section-title"><span class="icon">🔄</span> 15. Traversal Methods</div>
+
+  <div class="code-block">
+    <div class="code-header"><span>All 3 Ways to Traverse</span><span class="lang">Java</span></div>
+    <div class="code-body"><span class="ty">int</span>[] arr = {10, 20, 30, 40, 50};
+
+<span class="cmt">// Way 1: Classic for loop (index control)</span>
+<span class="kw">for</span> (<span class="ty">int</span> i = 0; i &lt; arr.length; i++) {
+    <span class="fn">System.out.println</span>(arr[i]);
+}
+
+<span class="cmt">// Way 2: Enhanced for-each (read-only, no index)</span>
+<span class="kw">for</span> (<span class="ty">int</span> num : arr) {
+    <span class="fn">System.out.println</span>(num);
+}
+
+<span class="cmt">// Way 3: Java 8 Streams (functional style)</span>
+<span class="ty">Arrays</span>.<span class="fn">stream</span>(arr).<span class="fn">forEach</span>(<span class="ty">System.out</span>::println);</div>
+  </div>
+
+  <h3>📊 When to Use Which?</h3>
+  <table>
+    <thead><tr><th>Method</th><th>Use When</th><th>Can Modify?</th></tr></thead>
+    <tbody>
+      <tr><td>Classic <code>for</code></td><td>Need index, reverse, two-pointer, modify in place</td><td>✅ Yes</td></tr>
+      <tr><td>Enhanced <code>for-each</code></td><td>Read-only clean iteration</td><td>❌ No</td></tr>
+      <tr><td>Streams</td><td>Functional ops: filter, map, reduce</td><td>❌ Produces new stream</td></tr>
+    </tbody>
+  </table>
+  <div class="callout interview"><span class="icon">🎯</span><div><strong>DSA Note:</strong> In interviews, prefer classic <ic>for</ic> loop — two-pointer, sliding window, prefix sums, and in-place ops all need index access.</div></div>
+</div>
+
+
+<!-- QUICK REFERENCE CARD -->
+<div class="section" style="border-color: var(--accent2);">
+  <div class="section-title" style="color:var(--accent2)"><span class="icon">⚡</span> Quick Reference — Interview Cheat Sheet</div>
+  <div class="grid2">
+    <div class="mini-card">
+      <div class="title">✅ Always Remember</div>
+      <ul class="notes" style="margin-top:8px">
+        <li>Arrays are <strong>objects</strong> → stored in Heap</li>
+        <li>Index: <ic>0</ic> to <ic>length-1</ic></li>
+        <li>Access is <strong>O(1)</strong> — formula-based</li>
+        <li>Size fixed at creation</li>
+        <li><ic>length</ic> is a field, not a method</li>
+        <li>Default: <ic>0</ic>, <ic>false</ic>, <ic>null</ic></li>
+        <li>Java supports <strong>Jagged Arrays</strong></li>
+      </ul>
+    </div>
+    <div class="mini-card">
+      <div class="title">🚨 Common Mistakes</div>
+      <ul class="notes" style="margin-top:8px">
+        <li><ic>i &lt;= length</ic> → AIOOBE (use <ic>&lt;</ic>)</li>
+        <li>Size in declaration: <ic>int[5] arr</ic> → CE</li>
+        <li>Static init separate: <ic>arr = {1,2}</ic> → CE</li>
+        <li><ic>char[]</ic> cannot assign to <ic>int[]</ic></li>
+        <li>Middle dim skip: <ic>new int[3][][5]</ic> → CE</li>
+        <li>Unallocated jagged row → NPE</li>
+        <li>Anonymous with size: <ic>new int[3]{...}</ic> → CE</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="footer">
+  ☕ Java Arrays Notes · Structured for OneNote · Dark Theme Ready<br>
+  Generated with 🤖 Claude · Open in browser → Ctrl+A → Ctrl+C → Paste into OneNote
+</div>
+
+</body>
+</html>
